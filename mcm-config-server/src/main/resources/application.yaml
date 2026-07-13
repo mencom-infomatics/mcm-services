@@ -1,0 +1,30 @@
+server:
+  port: 8888
+
+spring:
+  application:
+    name: mcm-config-server
+  profiles:
+    include: native
+
+  cloud:
+    config:
+      server:
+        prefix: /config
+        native:
+          search-locations:
+            - classpath:/configs/
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  endpoint:
+    health:
+      show-details: always
+
+eureka:
+  client:
+    fetch-registry: true
+    register-with-eureka: false

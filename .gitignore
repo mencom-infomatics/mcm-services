@@ -1,0 +1,65 @@
+# Gradle
+.gradle/
+build/
+gradle-app.setting
+!gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
+
+# IDE
+.idea/
+.vscode/
+*.iws
+*.iml
+*.ipr
+*.sublime-workspace
+*.sublime-project
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+.DS_Store
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+hs_err_pid*
+.mtj.tmp/
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Local environment
+.env
+.env.local
+*.properties.local
+application-local.properties
+application-local.yml
+
+# Logs
+*.log
+logs/
+
+# System files
+.git/
+.gitkeep

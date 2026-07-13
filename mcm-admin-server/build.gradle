@@ -1,0 +1,23 @@
+dependencyManagement {
+    imports {
+        mavenBom "de.codecentric:spring-boot-admin-dependencies:${springBootAdminVersion}"
+    }
+}
+
+dependencies {
+    implementation 'de.codecentric:spring-boot-admin-starter-server'
+    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+}
+
+jacocoTestCoverageVerification {
+    afterEvaluate {
+        classDirectories.setFrom(
+                files(classDirectories.files.collect {
+                    fileTree(dir: it, exclude: [
+                            '**/AdminServer.class'
+                    ])
+                })
+        )
+    }
+}

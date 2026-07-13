@@ -1,0 +1,16 @@
+server:
+  port: 9000
+
+spring:
+  application:
+    name: mcm-admin-server
+  boot:
+    admin:
+      ui:
+        brand: <img src="assets/img/icon-spring-boot-admin.svg"><span>MCM Admin Server</span>
+        title: MCM Admin Server
+
+
+eureka:
+  client:
+    registerWithEureka: false

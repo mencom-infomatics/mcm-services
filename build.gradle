@@ -1,0 +1,111 @@
+plugins {
+    id 'java'
+    id 'idea'
+    id 'eclipse'
+    id 'maven-publish'
+    id 'org.springframework.boot' version "${springBootVersion}" apply false
+    id 'io.spring.dependency-management' version "${springDependencyManagementVersion}" apply false
+    id 'org.cyclonedx.bom' version "${cyclonedxBomVersion}" apply false
+    id 'jacoco'
+}
+
+ext {
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
+}
+
+allprojects {
+
+    apply plugin: 'java'
+    apply plugin: 'io.spring.dependency-management'
+
+    group="${projectGroupId}"
+    version = findProperty('build.version') ?: "${projectVersion}"
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+            mavenBom "org.springframework.boot:spring-boot-dependencies:${springBootVersion}"
+        }
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8'
+        options.release = 21
+    }
+
+}
+
+subprojects {
+
+    apply plugin: 'jacoco'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'org.cyclonedx.bom'
+
+    dependencies {
+
+        // Utils Layer
+        compileOnly 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok'
+
+        // Testing Layer
+        testAnnotationProcessor 'org.projectlombok:lombok'
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    }
+
+    cyclonedxDirectBom {
+        // Include only runtime dependencies
+        includeConfigs = ["runtimeClasspath", "compileClasspath"]
+
+        // Exclude all test-related configurations using regex
+        skipConfigs = [".*test.*", ".*Test.*"]
+
+        // Metadata options
+        includeBomSerialNumber = true
+        includeLicenseText = true
+        includeMetadataResolution = true
+        includeBuildEnvironment = false
+        includeBuildSystem = true
+
+        // Custom output locations
+        jsonOutput = file("build/reports/sbom/${project.name}-sbom.json")
+        xmlOutput = file("build/reports/sbom/${project.name}-sbom.xml")
+    }
+
+    jacoco {
+        toolVersion = "0.8.14"
+    }
+
+    jacocoTestReport {
+        dependsOn test
+        reports {
+            html.required = true
+        }
+    }
+
+    jacocoTestCoverageVerification {
+        dependsOn jacocoTestReport
+        violationRules {
+            rule {
+                limit {
+                    minimum = 0.9
+                }
+            }
+        }
+    }
+
+    test {
+        useJUnitPlatform()
+        finalizedBy jacocoTestCoverageVerification
+    }
+}
