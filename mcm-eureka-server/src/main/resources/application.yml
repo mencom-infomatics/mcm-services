@@ -1,0 +1,38 @@
+server:
+  port: 8761
+
+spring:
+  application:
+    name: mcm-eureka-server
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          entries:
+            - issuer-uri: https://login.microsoftonline.com/e3b46b07-e513-4eff-b169-0e0c8c9c3ac0/v2.0
+
+eureka:
+  dashboard:
+    enabled: false
+  client:
+    fetchRegistry: false
+    registerWithEureka: false
+    jersy:
+      enabled: false
+
+management:
+  port: 4700
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+    info:
+      show-details: always
+
+logging:
+  level:
+    org.mencom: TRACE
+    org.springframework.security: DEBUG

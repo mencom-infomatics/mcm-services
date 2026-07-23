@@ -7,7 +7,11 @@ pluginManagement {
 
 rootProject.name = "mcm-services"
 
+
+include 'lib-security-oauth2-resource-server'
+
 include 'mcm-eureka-server'
 include 'mcm-admin-server'
 include 'mcm-config-server'
 include 'mcm-gateway-server'
+include 'lib-common'

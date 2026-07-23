@@ -1,4 +1,7 @@
 dependencies {
+    implementation project(':lib-security-oauth2-resource-server')
+
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-server'
     implementation 'com.github.ben-manes.caffeine:caffeine'
 }

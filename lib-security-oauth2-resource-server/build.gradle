@@ -1,0 +1,25 @@
+apply plugin: 'java-library'
+
+ext {
+    testExclusions = [
+            "**"
+    ]
+}
+
+bootJar {
+    enabled = false
+}
+
+dependencies {
+    api project(':lib-common')
+
+    api 'org.springframework.boot:spring-boot-autoconfigure'
+    api 'org.springframework.boot:spring-boot-starter-security-oauth2-resource-server'
+    api 'org.springframework.security:spring-security-oauth2-jose'
+
+    compileOnly 'jakarta.servlet:jakarta.servlet-api'
+
+    testImplementation 'org.springframework.boot:spring-boot-test-autoconfigure'
+    testImplementation 'org.springframework.boot:spring-boot-starter-security-oauth2-resource-server-test'
+    testImplementation 'jakarta.servlet:jakarta.servlet-api'
+}

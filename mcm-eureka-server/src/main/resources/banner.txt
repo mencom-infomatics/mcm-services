@@ -13,7 +13,7 @@
 
 ==================================================
     Application     : ${application.title}
-    VErsion         : ${application.version}
+    Version         : ${application.version}
     Spring Boot     : ${spring-boot.version}
     Spring Cloud    : ${spring-cloud.version}
     Java            : ${java.version}

@@ -1,0 +1,14 @@
+apply plugin: 'java-library'
+
+ext {
+    testExclusions = ["**"]
+}
+
+bootJar {
+    enabled = false
+}
+
+dependencies {
+    api 'org.springframework.boot:spring-boot-starter'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}

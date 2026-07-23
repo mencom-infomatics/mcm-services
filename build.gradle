@@ -2,65 +2,90 @@ plugins {
     id 'java'
     id 'idea'
     id 'eclipse'
-    id 'maven-publish'
-    id 'org.springframework.boot' version "${springBootVersion}" apply false
-    id 'io.spring.dependency-management' version "${springDependencyManagementVersion}" apply false
-    id 'org.cyclonedx.bom' version "${cyclonedxBomVersion}" apply false
+    id 'java-library'
+    id 'org.springframework.boot' version "${spring_boot_version}" apply false
+    id 'com.gorylenko.gradle-git-properties' version "${git_properties_version}" apply false
+    id 'io.spring.dependency-management' version "${spring_dependency_management_version}" apply false
+    id 'org.cyclonedx.bom' version "${cyclonedx_bom_version}" apply false
+    id 'org.sonarqube' version "${sonarqube_version}" apply false
     id 'jacoco'
 }
 
-ext {
-}
+// No build Jar for root project
+jar { enabled = false }
+test { enabled = false }
+assemble { enabled = false }
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }
 
 allprojects {
 
-    apply plugin: 'java'
-    apply plugin: 'io.spring.dependency-management'
-
-    group="${projectGroupId}"
-    version = findProperty('build.version') ?: "${projectVersion}"
+    group = "${project_group}"
+    version = findProperty('build.version') ?: "${project_default_version}"
+    if (!project.hasProperty('release') || project.property('release') != 'true') {
+        version += "-SNAPSHOT"
+    }
 
     repositories {
         mavenCentral()
-    }
-
-    dependencyManagement {
-        imports {
-            mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-            mavenBom "org.springframework.boot:spring-boot-dependencies:${springBootVersion}"
-        }
-    }
-
-    tasks.withType(JavaCompile).configureEach {
-        options.encoding = 'UTF-8'
-        options.release = 21
     }
 
 }
 
 subprojects {
 
-    apply plugin: 'jacoco'
+    apply plugin: 'java'
     apply plugin: 'org.springframework.boot'
     apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'com.gorylenko.gradle-git-properties'
     apply plugin: 'org.cyclonedx.bom'
+    apply plugin: 'org.sonarqube'
+    apply plugin: 'jacoco'
+
+    ext {
+        testExclusions = []
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:${spring_cloud_version}"
+            mavenBom "org.springframework.boot:spring-boot-dependencies:${spring_boot_version}"
+        }
+    }
 
     dependencies {
 
         // Utils Layer
         compileOnly 'org.projectlombok:lombok'
         annotationProcessor 'org.projectlombok:lombok'
+        implementation 'org.apache.commons:commons-lang3'
 
         // Testing Layer
         testAnnotationProcessor 'org.projectlombok:lombok'
-        testImplementation 'org.springframework.boot:spring-boot-starter-test'
         testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    }
+
+    gitProperties {
+        failOnNoGitDirectory = false
+    }
+
+    jar {
+        dependsOn test
+        dependsOn generateGitProperties
+        archiveClassifier = ''
+        manifest {
+            attributes(
+                    'Implementation-Title': project.name,
+                    'Implementation-Version': project.version,
+                    'Implementation-Vendor': 'Mencom Informatics',
+                    'Built-By': System.getProperty('user.name'),
+                    'Built-Date': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+            )
+        }
     }
 
     cyclonedxDirectBom {
@@ -87,9 +112,13 @@ subprojects {
     }
 
     jacocoTestReport {
-        dependsOn test
         reports {
             html.required = true
+        }
+        afterEvaluate {
+            classDirectories.setFrom(files(classDirectories.files.collect {
+                fileTree(dir: it, exclude: project.ext.testExclusions)
+            }))
         }
     }
 
@@ -101,6 +130,11 @@ subprojects {
                     minimum = 0.9
                 }
             }
+        }
+        afterEvaluate {
+            classDirectories.setFrom(files(classDirectories.files.collect {
+                fileTree(dir: it, exclude: project.ext.testExclusions)
+            }))
         }
     }
 
